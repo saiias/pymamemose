@@ -47,7 +47,7 @@ if sys.version_info[0:2] == (2, 6):
 setup(
     name = "pymamemose",
     version =version,
-    url ="",
+    url ="https://github.com/saiias/pymamemose",
     license = "New BSD",
     author ="Yuki Saitoh",
     author_email = "saiass0708 at gmail.com",
@@ -56,9 +56,9 @@ setup(
     install_requires = install_requires,
     packages=['pymamemose'],
     package_data={},
-    entry_points = dict(
-        console_scriptsx=["pymamemose = pymamemose:command"]
-        ),
+    entry_points = {
+        'console_scripts':["pymamemose = pymamemose:command"]
+        },
     extras_require =dict(
         test=['pytest>=2.3'
               ]
