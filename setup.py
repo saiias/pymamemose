@@ -54,7 +54,7 @@ setup(
     description = short_description,
     long_description = long_description,
     install_requires = install_requires,
-    package=['pymamemose'],
+    packages=['pymamemose'],
     package_data={},
     entry_points = dict(
         console_scriptsx=["pymamemose = pymamemose:command"]
