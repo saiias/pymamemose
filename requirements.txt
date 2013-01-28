@@ -1,0 +1,3 @@
+distribute
+pytest>=2.3
+pytest-cov>=1.6

@@ -1,0 +1,34 @@
+.DS_Store
+*~
+\#*
+*.py[co]
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+#logs
+pip-log.txt
+
+# Unit test
+.coverage
+.tox
+__pycache__/*
+
+*.mo
+.mr.developer.cfg
+
+# document
+docs/_build/*
+
+#test log
+junit-*.xml
