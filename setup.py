@@ -35,7 +35,7 @@ classifiers=[
     ]
 
 install_requires = [
-    'distribute'
+    'distribute',
     'docutils>=0.10'
     ]
     
