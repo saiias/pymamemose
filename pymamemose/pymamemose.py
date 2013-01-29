@@ -45,6 +45,7 @@ class Pymamemose():
         self.ignoreobj = re.compile(IGNORE_FILE)
         
     def make_html(self):
+        print RECENT_NUM
         path = DOCUMENT_ROOT+self.parsed_path.path
         query=urllib2.unquote(self.parsed_path.query)
         if path == DOCUMENT_ROOT + "/search":            
@@ -310,8 +311,8 @@ function copy(text) {
 <li><a href=" %s "> %s </a>
 <a class='filename' href="javascript:copy(' %s ');\">[ %s , file]</a></li>
 '''%(v[0],k,v[0],k)
+                index +=1
             body +='</ul>'
-            index +=1
             
         body += "<h2>Directories:</h2>"
         if len(dirs)>0:
