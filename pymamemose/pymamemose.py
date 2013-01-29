@@ -11,9 +11,15 @@ import urllib2
 import re
 
 HOME_DIR = os.environ["HOME"]
-SETTING=json.load(open(HOME_DIR+'/.pymamemose.json'))        
+
+try:
+    SETTING=json.load(open(HOME_DIR+'/.pymamemose.json'))
+except IOError,(errno,strerrno):
+    print "Don't exist ~/.pymamemose.json"
+    SETTING={"DOCUMENT_ROOT":"~/Dropbox/memo","RECENT_NUM":5,"PORT":8000,"REST_PATTERN":".rst","IGNORE_FILE":""}
+    
 DOCUMENT_ROOT =os.path.expanduser(SETTING["DOCUMENT_ROOT"]) if SETTING.has_key("DOCUMENT_ROOT") else "~/Dropbox/memo"
-RECENT_NUM =SETTING["RECENT_NUM"] if SETTING.has_key("RECENT_NUM") else 100
+RECENT_NUM =SETTING["RECENT_NUM"] if SETTING.has_key("RECENT_NUM") else 5
 PORT = SETTING["PORT"] if SETTING.has_key("PORT") else 8000
 REST_PATTERN  =SETTING["REST_PATTERN"] if SETTING.has_key("REST_PATTERN") else  ".rst"
 IGNORE_FILE =SETTING["IGNORE_FILE"] if SETTING.has_key("IGNORE_FILE") else ""
