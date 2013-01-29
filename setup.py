@@ -36,6 +36,7 @@ classifiers=[
 
 install_requires = [
     'distribute'
+    'docutils>=0.10'
     ]
     
 
@@ -47,7 +48,7 @@ if sys.version_info[0:2] == (2, 6):
 setup(
     name = "pymamemose",
     version =version,
-    url ="https://github.com/saiias/pymamemose",
+    url =r"https://github.com/saiias/pymamemose",
     license = "New BSD",
     author ="Yuki Saitoh",
     author_email = "saiass0708 at gmail.com",
