@@ -2,6 +2,8 @@
 pymamemose:reStructuredText memo server
 =======================================
 
+.. image :: https://travis-ci.org/saiias/pymamemose.png?branch=master
+
 概要
 =========
 - Rudy製のメモツール"mamemose"のpython移植版
