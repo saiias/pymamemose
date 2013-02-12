@@ -6,9 +6,9 @@ import subprocess
 import urlparse
 import os
 import json
-import codecs
 import urllib2
 import re
+import codecs
 
 HOME_DIR = os.environ["HOME"]
 
@@ -45,7 +45,6 @@ class Pymamemose():
         self.ignoreobj = re.compile(IGNORE_FILE)
         
     def make_html(self):
-        print RECENT_NUM
         path = DOCUMENT_ROOT+self.parsed_path.path
         query=urllib2.unquote(self.parsed_path.query)
         if path == DOCUMENT_ROOT + "/search":            
@@ -247,7 +246,6 @@ function copy(text) {
     
     def req_search(self,path,query):        
         query=query.split("&q=")[1]
-        print query.decode('utf-8')
         found = self.find(path,query)
         html_title = "Serch in "+path
         title = "</div><h1>Seach in %s </h1>"%(path)        
@@ -259,11 +257,13 @@ function copy(text) {
         elif len(found)>0:
             body +='<ul>'
             for k,v in found.items():
+                # size = float(getFileSize(v))/1024
+                size = 1.0
                 v=v.replace(DOCUMENT_ROOT+'/','')                            
                 body +='''
 <li><a href="%s">%s</a>
-<a class='filename' href="javascript:copy('%s');\">[ %s , KB]</a></li>
-'''%(v,k,v,k)
+<a class='filename' href="javascript:copy('%s');\">[%s , %.1f KB]</a></li>
+'''%(v,k,v,k,size)
                 
         body +='<ul>'
         body = title+body
@@ -278,13 +278,22 @@ function copy(text) {
         req:アクセスされたパス
         res:クエリ
         """
-        if os.path.splitext(req)[1]==".rst":
-            body =subprocess.check_output(['rst2html.py',req])            
+        header_html = self.header_html(req,req)
+        footer_html = self.footer_html()
+        body = ""
+        if isMatchedFile(self.restpatobj,os.path.splitext(req)[1]):
+            body +=subprocess.check_output(['rst2html.py',req])            
             body=body.split('<body>')[1]
             body=body.split('</body>')[0]            
-            header_html = self.header_html(req,req)
-            footer_html = self.footer_html()
-            return header_html.encode('ascii')+body+footer_html.encode('ascii')
+        else:
+            """
+            ReSTファイル以外の挙動
+            """
+            f=open(req,'r')
+            body += f.read()
+            f.close()
+
+        return header_html.encode('ascii')+body+footer_html.encode('ascii')
         
     def req_index(self,req,res):
         """
@@ -304,13 +313,14 @@ function copy(text) {
             body +='<ul>'
             index = 0
             for k,v in sorted(recent.items(),key=lambda x:x[1][1]):
+                size = float(getFileSize(v[0]))/1024
                 if index  == RECENT_NUM:
                     break
                 v[0] =v[0].replace(DOCUMENT_ROOT+'/','')
                 body +='''
 <li><a href=" %s "> %s </a>
-<a class='filename' href="javascript:copy(' %s ');\">[ %s , file]</a></li>
-'''%(v[0],k,v[0],k)
+<a class='filename' href="javascript:copy(' %s ');\">[%s , %.1f KB]</a></li>
+'''%(v[0],k,v[0],k,size)
                 index +=1
             body +='</ul>'
             
@@ -320,19 +330,19 @@ function copy(text) {
             for k,v in dirs.items():
                 body +='''
 <li><a href=" %s "> %s </a>
-<a class='filename' href="javascript:copy(' %s ');\">[ %s , dir]</a></li>
+<a class='filename' href="javascript:copy(' %s ');\">[%s,dir]</a></li>
 '''%(k,k,v,k)
             body +='</ul>'
             
-        body += "<h2>Rest documents:</h2>"
+        body += "<h2>ReST documents:</h2>"
         if len(rest)>0:
             body +='<ul>'
             for k,v in rest.items():
-                size = str(getFileSize(v)/1024)
+                size = float(getFileSize(v))/1024
                 v=v.replace(DOCUMENT_ROOT+'/','')
                 body +='''
 <li><a href=" %s "> %s </a>
-<a class='filename' href="javascript:copy(' %s ');\">[ %s , %s KB]</a></li>
+<a class='filename' href="javascript:copy(' %s ');\">[ %s , %.1f KB]</a></li>
 '''%(v,k,v,k,size)
             body +='</ul>'
             
@@ -340,12 +350,12 @@ function copy(text) {
         if len(others)>0:
             body +='<ul>'
             for k,v in others.items():
-                size = str(getFileSize(v)/1024)
+                size = float(getFileSize(v))/1024
                 v=v.replace(DOCUMENT_ROOT,'')
                 
                 body +='''
 <li><a href=" %s "> %s </a>
-<a class='filename' href="javascript:copy(' %s ');\">[ %s , %s KB]</a></li>
+<a class='filename' href="javascript:copy(' %s ');\">[%s , %.1f KB]</a></li>
 '''%(k,k,v,k,size)
             body +='</ul>'
         header_html = self.header_html(req,req)
@@ -360,10 +370,11 @@ function copy(text) {
         """
         found = dict()
         for root,dirs,files in os.walk(DOCUMENT_ROOT):
-            for file in files:
-                for line in codecs.open(root+'/'+file,'r',encoding='utf-8'):
+            for fl in files:
+                for line in codecs.open(root+'/'+fl,'r','utf-8'):
+                    print type(line)
                     if line.find(query.decode('utf-8')) != -1:
-                        found[file]=root+'/'+file                
+                        found[fl]=root+'/'+fl
         return found
     
     def recent_files(self):
@@ -403,7 +414,7 @@ def getFileSize(file):
 
 def isMatchedFile(patobj,filename):
     """
-    拡張子が.rstだったらTrue
+    拡張子がpatobjだったらTrue
     そうでないならFalse
     >>> pat = re.compile(".(rst|rest|txt)$")
     >>> isMatchedFile(pat,"test.rst")
